@@ -2,8 +2,9 @@ from django.http import HttpResponse, JsonResponse,HttpRequest
 from django.views import View
 # Import user model
 from django.contrib.auth.models import User
-from .models import Task, Student
+from .models import Task
 # Import authentication classes
+import json
 from django.contrib.auth import authenticate
 from base64 import b64decode
 
@@ -20,37 +21,39 @@ def isAuth(auth):
     user = authenticate(username=username, password=password)
 
     if user is not None:
-        return True
+        return user
     return False
 
 
 
-def tasks(request: HttpRequest) -> JsonResponse:
+def add(request: HttpRequest) -> JsonResponse:
     """
     Create a task
     """
     auth = request.headers.get('Authorization')
     if isAuth(auth):
         if request.method == 'POST':
-            return JsonResponse({'message': 'Task created successfully'}, status=201)
-        if request.method == 'GET':
-            todos = {
-                'todo':[]
-            }
-            # Get all tasks
-            tasks = Task.objects.all()
-            for task in tasks:
-                todos['todo'].append({
-                    'id': task.id,
-                    'task': task.task,
-                    'description': task.description,
-                    'complited': task.complited,
-                    'created_at': task.created_at,
-                    'updated_at': task.updated_at,
-                   
-                })
+            body = request.body
+        # get body data
+            decoded = body.decode()
+            # data to dict
+            data = json.loads(decoded)
+            task=data.get("task",False)
+            description=data.get("description",False)
+            complited=data.get("complited",False)
+            result=Task(
+                task=task,
+                description=description,
+                complited=complited,
+                student=isAuth(auth)
 
-            return JsonResponse(todos, status=200)
+
+            )
+            result.save()
+            return JsonResponse ({"result": "ok"})
+
+        
+        
         
     else:
         return JsonResponse({'message': 'Unauthorized'}, status=401)
