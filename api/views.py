@@ -6,6 +6,7 @@ from .models import Task
 # Import authentication classes
 from django.core.exceptions import ObjectDoesNotExist
 import json
+from django.shortcuts import  render
 from django.contrib.auth import authenticate
 from base64 import b64decode
 
@@ -71,6 +72,19 @@ def delete_task(request:HttpRequest, pk :id):
                 return JsonResponse(product.to_dict())
             except ObjectDoesNotExist:
                 return JsonResponse({"status": "object doesn't exist"})
+
+def index(request:HttpResponse):
+    # Check if user is authenticated
+    
+    context= {
+        "data":"salom",
+        
+    }
+    return render (
+        request,
+        "base.html",
+        context=context
+    )
 
 
 
