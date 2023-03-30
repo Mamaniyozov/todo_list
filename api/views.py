@@ -4,6 +4,7 @@ from django.views import View
 from django.contrib.auth.models import User
 from .models import Task
 # Import authentication classes
+from django.core.exceptions import ObjectDoesNotExist
 import json
 from django.contrib.auth import authenticate
 from base64 import b64decode
@@ -57,8 +58,19 @@ def add(request: HttpRequest) -> JsonResponse:
         
     else:
         return JsonResponse({'message': 'Unauthorized'}, status=401)
-
-            
+def delete_task(request:HttpRequest, pk :id):
+     
+    auth = request.headers.get('Authorization')
+    if isAuth(auth):
+        
+        if request.method == "POST":
+            try:
+                # get product from database by id
+                product = User.objects.get(id=pk)
+                product.delete()
+                return JsonResponse(product.to_dict())
+            except ObjectDoesNotExist:
+                return JsonResponse({"status": "object doesn't exist"})
 
 
 
