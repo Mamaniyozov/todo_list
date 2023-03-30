@@ -6,5 +6,5 @@ from api.views import add,delete_task
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('add/',add),
-    path('delte/',delete_task),
+    path('delete/',delete_task),
 ]
